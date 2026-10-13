@@ -1,0 +1,354 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="免费公开的现代思维人生指南，帮助你把一件事整理成自己的下一步。">
+  <title>现代思维人生指南</title>
+  <style>
+:root { color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #18212b; background: #f6f7f5; }
+* { box-sizing: border-box; }
+body { margin: 0; line-height: 1.6; }
+a { color: #185c58; }
+header, main, footer { max-width: 1100px; margin: auto; padding: 1.2rem; }
+header { display: flex; justify-content: space-between; gap: 1rem; align-items: center; }
+nav { display: flex; gap: .8rem; flex-wrap: wrap; }
+h1, h2, h3 { line-height: 1.2; }
+.hero { background: #e3f0e9; border-radius: 18px; padding: 2rem; }
+.hero p { max-width: 720px; }
+.controls, .layout { display: grid; gap: 1rem; }
+.controls { grid-template-columns: 2fr 1fr; margin: 1.5rem 0; }
+.layout { grid-template-columns: minmax(0, 2fr) minmax(260px, 1fr); align-items: start; }
+.card, aside, form, .export { background: #fff; border: 1px solid #d9e1dc; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
+.card header { padding: 0; align-items: flex-start; }
+.tag { color: #53655e; font-size: .9rem; }
+label { display: block; font-weight: 650; margin: .7rem 0; }
+input, textarea, select, button { width: 100%; font: inherit; padding: .65rem; border: 1px solid #aebcb4; border-radius: 8px; }
+textarea { min-height: 6rem; resize: vertical; }
+button { cursor: pointer; background: #185c58; color: white; border-color: #185c58; margin-top: .5rem; }
+button.secondary { background: white; color: #185c58; }
+.guide-actions { display: flex; gap: .5rem; flex-wrap: wrap; }
+.guide-actions button { width: auto; }
+.notice { min-height: 1.5rem; color: #8b3b20; }
+footer { color: #53615a; font-size: .9rem; }
+body, p, h1, h2, h3, summary, button, label, a { overflow-wrap: anywhere; }
+@media (max-width: 760px) { header, .controls, .layout { display: block; } .controls > * { margin-bottom: .7rem; } }
+
+</style>
+</head>
+<body id="top">
+  <header><strong>这件事，下一步</strong><nav><a href="#guides">指南说明</a><a href="#top">离线版</a></nav></header>
+  <main>
+    <section class="hero"><h1>现代思维人生指南</h1><p>把复杂的一件事写下来，先分清已知、未知和下一步。这里的内容免费试用，记录只保存在你的浏览器里。</p><p>本站不提供自动AI聊天。你可以把自己的材料复制到你已有的AI，是否使用由你自己决定。</p></section>
+    <section class="controls" aria-label="指南筛选"><input id="search" type="search" placeholder="搜索指南" aria-label="搜索指南"><select id="category" aria-label="选择类别"><option value="">全部类别</option></select></section>
+    <div class="layout"><section><h2>公开指南</h2><p id="guide-count" class="tag"></p><div id="guides"></div></section><aside><h2>整理一件事</h2><p class="tag">用户自愿填写；空判断也可以保存。页面显示“未验证”时，不代表现实效果已被证明。</p><button id="new-record" class="secondary" type="button">开始新记录</button><form id="record-form"><label>我遇到的问题<input id="input" required></label><label>我现在的判断（可留空）<textarea id="answer"></textarea></label><label>下一步（可留空）<input id="choice"></label><label>什么变化时回看（可留空）<input id="review"></label><button type="submit">保存我的记录</button><p id="notice" class="notice" role="status"></p></form><div id="records"></div><div class="export"><h3>备份与恢复</h3><textarea id="backup" aria-label="JSON备份内容" placeholder="导出后可复制保存"></textarea><button id="export-copy" class="secondary" type="button">导出并复制</button><button id="export-download" class="secondary" type="button">下载JSON备份</button><label>导入JSON<input id="import-file" type="file" accept="application/json,.json"></label><button id="clear" class="secondary" type="button">清除此设备上的记录</button></div></aside></div>
+  </main>
+  <footer><p><a href="https://fancy0121.github.io/modern-thinking-guide/download/modern-thinking-guide.zip">下载公开包</a> · <a href="#offline-privacy">隐私说明</a> · <a href="https://github.com/fancy0121/modern-thinking-guide">GitHub</a> · <a href="https://github.com/fancy0121/modern-thinking-guide/issues">反馈（请不要公开私人故事）</a></p></footer>
+
+
+<section class="offline-legal"><h2 id="offline-privacy">隐私说明</h2><pre># 隐私与记录
+
+本站是免费静态网页，没有账户、广告、统计脚本或接收个人记录的后端。
+
+- 你填写的事情和判断，仅在点击保存后写入本浏览器的localStorage。本工具不会自动上传这些文本。
+- 本地保存是明文。同一设备和浏览器的其他使用者可能看到；浏览器清理、换设备或部分隐私模式可能导致记录丢失。重要记录请自行导出。
+- 导入文件由你的浏览器读取，不发送到本站服务。导出文件可能含你自己填写的私人情况，请保管好，不要直接上传公开仓库。
+- 复制给AI、打开GitHub或提交Issue是你主动进行的独立操作。粘贴给AI后，对方服务会收到内容，请按其条款和你自己的意愿选择资料。
+- GitHub Pages作为网页托管方可能记录访问者IP等安全访问日志。参见[GitHub Pages官方说明](https://docs.github.com/en/pages/getting-started-with-github-pages/what-is-github-pages#data-collection)。本站不宣称访问过程完全匿名。
+- 清除按钮仅清除本工具在当前浏览器保存的记录，并要求确认；它不会清除导出文件、你给AI的内容或第三方访问日志。
+
+不需要输入证件号码、账户密钥或与这件事无关的私人信息。只阅读指南完全可以不保存任何判断。
+</pre><h2 id="offline-notice">免费使用与权利说明</h2><pre># 免费使用与权利说明
+
+本版允许任何人免费访问网页、下载使用包和作个人使用；没有收费、广告或付费升级入口。
+
+公开文件中的指南是本项目原创的通用建议。代码与原创文本保留其他权利；本版尚未声明MIT、CC BY或其他开放再分发/商业改编许可。公开可读不等于获得付费课程素材或其他作者的权利。需要转载、重新分发或商业改编时，请先向项目方确认范围。
+
+本项目未收录课程PDF、逐页提取、蒸馏库或课程原文；不代表万维钢或其他作者，不声称获得其品牌背书或其作品的公开再分发授权。
+
+原始概念的出处、某一方法的研究支持和这个网页的实际效果是不同问题。本组指南暂为项目原创通用建议，尚未证明能稳定改善真实判断或优于同级通用AI/普通笔记。
+
+涉及急症、即时危险、具体医疗、法律、投资或不可逆重大决定时，这个阅读和记录工具不能代替必要的现实资料与专业支持。
+</pre></section>
+<script>
+window.PUBLIC_GUIDES = {
+  "version": "2026-10-13-alpha.1",
+  "notice": "公开试用；本组通用指南与整理功能尚未证明能稳定优于通用AI或普通笔记。",
+  "cards": [
+    {
+      "id": "clarify-next",
+      "title": "事情有点乱，先找眼下那一步",
+      "category": "选择",
+      "summary": "先把“大问题”缩到一个现在能处理的阻碍。",
+      "when": "你已经看了很多建议，却仍不知道今天该做什么。",
+      "steps": [
+        "用一句话写下这次最想得到的变化；不用把整个人生都规划好。",
+        "挑出一个会影响下一步的未知：是截止时间、资源、别人的意愿，还是你愿意承担的代价？",
+        "先做一件能缩小这个未知的小事，例如确认要求、获得一份材料或试一次。"
+      ],
+      "watch": "信息拿到后，看它是否真的改变了一个选项或下一步。",
+      "limit": "有些阻碍来自钱、权限或现实条件，整理思路不能自动消除它们。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "fact-and-guess",
+      "title": "把看到的事和自己的解释分开",
+      "category": "关系",
+      "summary": "保留你的感受，同时给还没核实的解释留一点空间。",
+      "when": "你在想“他是不是故意这样”“我是不是一定做错了”。",
+      "steps": [
+        "先写下能直接说明的事情：谁说了什么、做了什么、何时发生。",
+        "把“为什么”单独写成一种可能的解释，不急着当成事实。",
+        "需要行动时，先找一个能区分解释的问题或观察；不需要查证时，也可以暂时不判断动机。"
+      ],
+      "watch": "如果新信息支持另一种解释，改变解释，不必否定自己当时的感受。",
+      "limit": "这不是让你忽视已经发生的伤害，也不要求你替别人找借口。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "small-trial",
+      "title": "投入之前，先做一次小试",
+      "category": "投入",
+      "summary": "用一次能退出的小尝试，替代过早的大承诺。",
+      "when": "你想买设备、报课程或启动项目，但不确定自己是否会持续使用。",
+      "steps": [
+        "找出最担心的条件：是否愿意用、能否坚持、是否有需要的资源。",
+        "选择一个小尝试，例如体验一次、用现有工具做一份样品或跟使用者确认实际步骤。",
+        "试之前写一句继续条件和停止条件；不要只看当下的新鲜感。"
+      ],
+      "watch": "按试用中实际发生的事情决定下一笔投入，允许结论是暂不买、不扩大。",
+      "limit": "小试不能证明长期结果；涉及重大损失或不可逆行为时，应先查清必要条件。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "clear-delivery",
+      "title": "合作卡住时，先确认交付",
+      "category": "工作",
+      "summary": "把“我应该多做多少”变成具体的范围、节点和缺口。",
+      "when": "任务分工发生变化，或者你不知道别人期待什么。",
+      "steps": [
+        "确认最近需要交出的东西，以及谁能决定验收要求。",
+        "把已有材料、明确缺口和需要他人提供的部分放在同一处。",
+        "先做容易衔接、不会轻易白做的部分；额外承担之前，把范围说清楚。"
+      ],
+      "watch": "如果期限、验收标准或可用支持改变，重新排优先级，而不是自动接下全部工作。",
+      "limit": "这不能替代实际协商；不要把尚未确认的支持当作已经到位。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "practice-feedback",
+      "title": "学习时，用一点实践检查方向",
+      "category": "学习",
+      "summary": "先做出一点东西，再看缺哪一块。",
+      "when": "资料越看越多，实际练习却一直没开始。",
+      "steps": [
+        "选一个很小的结果，例如写一个可运行的示例、拍一组照片或完成一段练习。",
+        "用手头资源试做一次；遇到的具体困难再用来决定下一份资料。",
+        "留下一个做得较好的地方和一个需要调整的地方，下次只试一个变化。"
+      ],
+      "watch": "看实际作品或反馈是否变化，不用观看时长和收藏数量代替学习结果。",
+      "limit": "基础知识和安全要求仍可能必需；这里不主张对所有领域都边做边猜。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "new-information",
+      "title": "新消息来了，检查哪一部分要改",
+      "category": "修订",
+      "summary": "新事实不必推翻一切，但也别继续依赖失效的前提。",
+      "when": "计划做了一半，期限、资源、目标或重要事实发生了变化。",
+      "steps": [
+        "指出这条新消息改变的是事实、可用资源，还是你现在的目标。",
+        "对照原判断，找到哪一个条件不再成立；没被改变的部分可以保留。",
+        "写下一句新的行动，以及现在仍不知道的事情；把旧判断留下，便于之后复查。"
+      ],
+      "watch": "区分“答应会做”和“实际做到了”；一次变化也不能证明以后都会如此。",
+      "limit": "信息还不够时，可以维持、暂停或等待，不必为了显得灵活而改主意。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "listen-first",
+      "title": "现在很难受，可以先不用解决问题",
+      "category": "关系",
+      "summary": "表达感受本身可以是这次交流的目标。",
+      "when": "你想把烦躁或委屈说出来，还没有打算作决定。",
+      "steps": [
+        "先说出让你难受的具体事情，以及最在意的那部分。",
+        "如果别人急着给方案，可以说明这次更需要倾听，行动可以稍后再谈。",
+        "愿意的时候再讨论下一步；不需要为了证明自己认真而立即完成一张计划表。"
+      ],
+      "watch": "当你想要的帮助改变时，明确告诉对方；之前不行动不等于以后不能行动。",
+      "limit": "正在发生的人身危险或急症需要及时获得现实支持，不能只靠记录或聊天等待。",
+      "origin": "本项目原创通用建议"
+    },
+    {
+      "id": "next-cost",
+      "title": "已经花了很多，下一笔还值得吗",
+      "category": "投入",
+      "summary": "保留过去的经验，重新判断从今天起还要付出什么。",
+      "when": "你犹豫是否继续一项投入，理由主要是“已经花了这么多”。",
+      "steps": [
+        "把过去已经无法收回的投入，与从现在起仍能选择的投入分开。",
+        "只看下一段投入可能换来什么，是否还有更合适的替代办法。",
+        "可以缩小、暂停或结束；也可以继续，但给继续写一个能检查的理由。"
+      ],
+      "watch": "如果继续条件长期没有出现，别只因投入越来越多就不断提高预算。",
+      "limit": "承诺、退出成本和对他人的影响可能仍是真实约束，不能因为过去花费已发生就忽略它们。",
+      "origin": "本项目原创通用建议"
+    }
+  ]
+};
+
+'use strict';
+
+(function (root) {
+  const MAX_BYTES = 1000000;
+  const MAX_RECORDS = 200;
+  const MAX_VERSIONS = 200;
+
+  function clone(value) { return JSON.parse(JSON.stringify(value)); }
+
+  function validate(state) {
+    if (!state || !Array.isArray(state.records) || state.records.length > MAX_RECORDS) throw Error('记录格式不正确。');
+    const ids = new Set();
+    for (const record of state.records) {
+      if (!record || typeof record.id !== 'string' || !record.id.trim() || ids.has(record.id) || !Array.isArray(record.versions) || !record.versions.length || record.versions.length > MAX_VERSIONS) throw Error('记录格式不正确。');
+      ids.add(record.id);
+      for (const version of record.versions) {
+        if (!version || ['input', 'answer', 'choice', 'review', 'at'].some(key => typeof version[key] !== 'string')) throw Error('记录格式不正确。');
+        if (!version.input.trim() || version.input.length > 4000 || version.answer.length > 8000 || version.choice.length > 1000 || version.review.length > 1000 || version.at.length > 100) throw Error('记录格式不正确。');
+      }
+    }
+    return state;
+  }
+
+  function serialized(state) {
+    const text = JSON.stringify(state);
+    if (text.length > MAX_BYTES) throw Error('记录文件过大，请先导出。');
+    return text;
+  }
+
+  function decode(text) {
+    if (typeof text !== 'string' || text.length > MAX_BYTES) throw Error('记录文件过大。');
+    try { return validate(JSON.parse(text)); } catch (_) { throw Error('记录格式不正确。请保留原文件。'); }
+  }
+
+  function commit(state, selectedId, data, id, at) {
+    validate(state);
+    if (!data || typeof data.input !== 'string' || !data.input.trim() || typeof data.answer !== 'string' || typeof data.choice !== 'string' || typeof data.review !== 'string' || typeof at !== 'string') throw Error('记录内容不正确。');
+    const next = clone(state);
+    let record = selectedId ? next.records.find(item => item.id === selectedId) : null;
+    if (selectedId && !record) throw Error('原记录不存在。');
+    if (!record) { record = { id, versions: [] }; next.records.push(record); }
+    record.versions.push({ input: data.input, answer: data.answer, choice: data.choice, review: data.review, at });
+    validate(next);
+    serialized(next);
+    return next;
+  }
+
+  function persist(storage, key, expected, state) {
+    validate(state);
+    if (storage.getItem(key) !== expected) throw Error('另一个页面修改了记录，已停止覆盖。请复制当前回答后刷新。');
+    const text = serialized(state);
+    storage.setItem(key, text);
+    return text;
+  }
+
+  function merge(existing, incoming) {
+    validate(existing); validate(incoming);
+    const next = clone(existing);
+    for (const incomingRecord of incoming.records) {
+      const found = next.records.find(item => item.id === incomingRecord.id);
+      if (!found) { next.records.push(clone(incomingRecord)); continue; }
+      if (JSON.stringify(found) !== JSON.stringify(incomingRecord)) throw Error('导入记录冲突，已保留已有记录。');
+    }
+    validate(next); serialized(next); return next;
+  }
+
+  function context(state, selectedId, guide) {
+    validate(state);
+    const records = selectedId ? state.records.filter(item => item.id === selectedId) : state.records;
+    const lines = ['用户自己的笔记（以下判断均由用户填写，不是AI答案）：'];
+    for (const record of records) for (const version of record.versions) {
+      lines.push(`问题：${version.input}`, `我的判断：${version.answer || '（尚未形成判断）'}`);
+      if (version.choice) lines.push(`我的下一步：${version.choice}`);
+      if (version.review) lines.push(`我计划回看：${version.review}`);
+    }
+    if (guide) {
+      lines.push('自愿附加的公开指南（原创项目材料，未验证，不是用户笔记）：');
+      lines.push(`标题：${guide.title || ''}`, `版本：${guide.version || '未提供'}`, `摘要：${guide.summary || ''}`, `适用时机：${guide.when || ''}`, `步骤：${(guide.steps || []).join(' → ')}`, `留意：${guide.watch || ''}`, `边界：${guide.limit || ''}`);
+    }
+    return lines.join('\n');
+  }
+
+  const api = { decode, commit, persist, merge, context, validate };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.DecisionRecord = api;
+})(typeof window !== 'undefined' ? window : globalThis);
+
+(function () {
+  'use strict';
+  const KEY = 'modern-thinking-public-record-v1';
+  const MAX_IMPORT_BYTES = 1000000;
+  const guides = (window.PUBLIC_GUIDES && Array.isArray(window.PUBLIC_GUIDES.cards)) ? window.PUBLIC_GUIDES.cards : [];
+  const $ = id => document.getElementById(id);
+  const state = { data: { records: [] }, raw: null, selectedGuide: null, selectedRecord: null, locked: false, stale: false, corruptRaw: null };
+  try { state.raw = localStorage.getItem(KEY); state.data = state.raw ? DecisionRecord.decode(state.raw) : { records: [] }; }
+  catch (_) { state.corruptRaw = state.raw; state.locked = true; state.data = { records: [] }; }
+  function show(message) { $('notice').textContent = message || ''; }
+  function formValues() { return { input: $('input').value, answer: $('answer').value, choice: $('choice').value, review: $('review').value }; }
+  function persist(next) {
+    if (state.locked) { show(state.corruptRaw !== null ? '记录数据损坏，已停止覆盖。请先下载原始备份或明确清除。' : '浏览器本地存储不可用，无法保存；表单内容已保留，请复制备份。'); return false; }
+    if (state.stale) { show('检测到另一个页面修改了记录，已停止覆盖；当前表单内容已保留。'); return false; }
+    try { const written = DecisionRecord.persist(localStorage, KEY, state.raw, next); state.data = next; state.raw = written; state.selectedRecord = null; renderRecords(); show('已保存到此浏览器。'); return true; }
+    catch (error) { show(error.message || '保存失败；表单内容已保留，请复制后重试。'); return false; }
+  }
+  function button(label, handler, secondary) { const b = document.createElement('button'); b.type = 'button'; b.textContent = label; if (secondary) b.className = 'secondary'; b.addEventListener('click', handler); return b; }
+  function renderGuides() {
+    const box = $('guides'); box.replaceChildren(); const query = $('search').value.trim().toLowerCase(); const category = $('category').value;
+    const filtered = guides.filter(g => (!category || g.category === category) && (!query || [g.title,g.summary,g.when,g.watch,g.limit,...(g.steps || [])].join(' ').toLowerCase().includes(query)));
+    $('guide-count').textContent = filtered.length ? `显示 ${filtered.length} / ${guides.length} 篇` : `没有找到匹配指南（共 ${guides.length} 篇）`;
+    filtered.forEach(g => { const card = document.createElement('article'); card.className = 'card'; const h = document.createElement('h3'); h.textContent = g.title; card.append(h); const tag = document.createElement('p'); tag.className = 'tag'; tag.textContent = `${g.category || ''} · 原创项目材料 · 未验证`; card.append(tag); const summary = document.createElement('p'); summary.textContent = g.summary || ''; card.append(summary); const details = document.createElement('details'); const summaryEl = document.createElement('summary'); summaryEl.textContent = '展开这篇指南'; details.append(summaryEl); [['适用时机',g.when],['步骤',(g.steps || []).join(' → ')],['留意',g.watch],['边界',g.limit],['来源状态',g.origin]].forEach(([label,value]) => { const p = document.createElement('p'); const strong = document.createElement('strong'); strong.textContent = `${label}：`; p.append(strong, document.createTextNode(value || '')); details.append(p); }); card.append(details); const actions = document.createElement('div'); actions.className = 'guide-actions'; actions.append(button('用这篇整理一件事', () => { state.selectedGuide = { ...g, version: window.PUBLIC_GUIDES.version || '未提供' }; renderRecords(); $('input').focus(); show(`已选择“${g.title}”，保存后可复制到已有AI。`); })); card.append(actions); box.append(card); });
+  }
+  function renderRecords() {
+    const box = $('records'); box.replaceChildren(); const h = document.createElement('h3'); h.textContent = '已保存记录与历史版本'; box.append(h);
+    state.data.records.forEach(record => {
+      const item = document.createElement('details');
+      const title = document.createElement('summary');
+      title.textContent = `${record.versions[0].input}（${record.versions.length}个版本）`;
+      item.append(title);
+      record.versions.forEach((version, index) => {
+        const p = document.createElement('p');
+        p.textContent = `版本 ${index + 1}｜${version.at}\n问题：${version.input}\n判断：${version.answer || '尚未形成判断'}\n下一步：${version.choice || '未填写'}\n回看：${version.review || '未填写'}`;
+        item.append(p);
+      });
+      item.append(button('修订这条记录', () => {
+        state.selectedRecord = record.id;
+        const latest = record.versions[record.versions.length - 1];
+        $('input').value = latest.input; $('answer').value = latest.answer; $('choice').value = latest.choice; $('review').value = latest.review;
+        show('正在修订这条记录；保存会追加一个历史版本。'); $('input').focus();
+      }));
+      item.append(button('复制我的记录到AI', () => copyText(DecisionRecord.context(state.data, record.id, null))));
+      if (state.selectedGuide) {
+        const guide = state.selectedGuide;
+        item.append(button(`附上“${guide.title}”复制到AI`, () => copyText(DecisionRecord.context(state.data, record.id, guide)), true));
+      }
+      box.append(item);
+    });
+  }
+  async function copyText(text) { try { await navigator.clipboard.writeText(text); show('已复制；请粘贴到你已有的AI。'); } catch (_) { $('backup').value = text; $('backup').focus(); $('backup').select(); show('浏览器未允许自动复制，已放入文本框，请手动复制。'); } }
+  function backupText() { return state.locked && state.corruptRaw !== null ? state.corruptRaw : JSON.stringify(state.data, null, 2); }
+  function downloadBackup() { const blob = new Blob([backupText()], { type: 'application/json;charset=utf-8' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = 'modern-thinking-records.json'; link.click(); URL.revokeObjectURL(url); show('已下载JSON备份。'); }
+  $('category').replaceChildren(new Option('全部类别', '')); [...new Set(guides.map(g => g.category).filter(Boolean))].forEach(c => $('category').append(new Option(c, c)));
+  $('search').addEventListener('input', renderGuides); $('category').addEventListener('change', renderGuides);
+  $('new-record').addEventListener('click', () => { state.selectedRecord = null; state.selectedGuide = null; $('record-form').reset(); show('已开始新记录。'); });
+  $('record-form').addEventListener('submit', event => { event.preventDefault(); const values = formValues(); const id = state.selectedRecord || `r-${Date.now()}-${Math.random().toString(36).slice(2,8)}`; try { const next = DecisionRecord.commit(state.data, state.selectedRecord, values, id, new Date().toISOString()); if (persist(next)) event.target.reset(); } catch (error) { show(error.message || '保存失败；表单内容已保留，请重试。'); } });
+  $('export-copy').addEventListener('click', () => { $('backup').value = backupText(); copyText($('backup').value); }); $('export-download').addEventListener('click', downloadBackup);
+  $('import-file').addEventListener('change', event => { const file = event.target.files[0]; if (!file) return; if (file.size > MAX_IMPORT_BYTES) { show('导入文件过大，已有记录未改变。'); event.target.value = ''; return; } if (state.locked) { show('记录数据损坏，已停止导入；请先下载原始备份或明确清除。'); event.target.value = ''; return; } const reader = new FileReader(); reader.onload = () => { try { const incoming = DecisionRecord.decode(String(reader.result)); persist(DecisionRecord.merge(state.data, incoming)); } catch (error) { show(error.message || '导入失败，已有记录未改变。'); } event.target.value = ''; }; reader.readAsText(file); });
+  $('clear').addEventListener('click', () => { if (!window.confirm('确定清除此设备上保存的记录吗？')) return; try { if (localStorage.getItem(KEY) !== state.raw) throw Error('另一个页面修改了记录，已停止覆盖。'); localStorage.removeItem(KEY); state.data = { records: [] }; state.raw = null; state.locked = false; state.corruptRaw = null; state.stale = false; state.selectedRecord = null; state.selectedGuide = null; renderRecords(); show('已清除本设备记录。'); } catch (error) { show(error.message); } });
+  window.addEventListener('storage', event => { if (event.key !== KEY) return; state.stale = true; show('另一个页面修改了记录；当前表单内容已保留，请刷新后再决定如何处理。'); });
+  if (state.locked) { $('backup').value = state.corruptRaw || ''; show(state.corruptRaw !== null ? '本地记录无法读取，已闭锁保存与导入；请先下载原始备份或明确清除。' : '浏览器本地存储不可用；仍可阅读指南，请复制保留自己的输入。'); } renderGuides(); renderRecords();
+})();
+
+</script>
+</body>
+</html>

@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; connect-src 'self'; object-src 'none'; base-uri 'none'">
+  <meta name="description" content="免费公开的现代思维人生指南，帮助你把一件事整理成自己的下一步。">
+  <title>现代思维人生指南</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body>
+  <header><strong>这件事，下一步</strong><nav><a href="./guide.md">指南说明</a><a href="./offline.html">离线版</a></nav></header>
+  <main>
+    <section class="hero"><h1>现代思维人生指南</h1><p>把复杂的一件事写下来，先分清已知、未知和下一步。这里的内容免费试用，记录只保存在你的浏览器里。</p><p>本站不提供自动AI聊天。你可以把自己的材料复制到你已有的AI，是否使用由你自己决定。</p></section>
+    <section class="controls" aria-label="指南筛选"><input id="search" type="search" placeholder="搜索指南" aria-label="搜索指南"><select id="category" aria-label="选择类别"><option value="">全部类别</option></select></section>
+    <div class="layout"><section><h2>公开指南</h2><p id="guide-count" class="tag"></p><div id="guides"></div></section><aside><h2>整理一件事</h2><p class="tag">用户自愿填写；空判断也可以保存。页面显示“未验证”时，不代表现实效果已被证明。</p><button id="new-record" class="secondary" type="button">开始新记录</button><form id="record-form"><label>我遇到的问题<input id="input" required></label><label>我现在的判断（可留空）<textarea id="answer"></textarea></label><label>下一步（可留空）<input id="choice"></label><label>什么变化时回看（可留空）<input id="review"></label><button type="submit">保存我的记录</button><p id="notice" class="notice" role="status"></p></form><div id="records"></div><div class="export"><h3>备份与恢复</h3><textarea id="backup" aria-label="JSON备份内容" placeholder="导出后可复制保存"></textarea><button id="export-copy" class="secondary" type="button">导出并复制</button><button id="export-download" class="secondary" type="button">下载JSON备份</button><label>导入JSON<input id="import-file" type="file" accept="application/json,.json"></label><button id="clear" class="secondary" type="button">清除此设备上的记录</button></div></aside></div>
+  </main>
+  <footer><p><a href="./download/modern-thinking-guide.zip">下载公开包</a> · <a href="./PRIVACY.md">隐私说明</a> · <a href="https://github.com/fancy0121/modern-thinking-guide">GitHub</a> · <a href="https://github.com/fancy0121/modern-thinking-guide/issues">反馈（请不要公开私人故事）</a></p></footer>
+  <script defer src="./content/guides.js"></script><script defer src="./core.js"></script><script defer src="./app.js"></script>
+</body>
+</html>
