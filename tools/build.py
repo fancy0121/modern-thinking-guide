@@ -1,4 +1,4 @@
-"""Build the free static edition from its original, public content. No dependencies."""
+"""Build the free edition from original, source-attributed applications. No dependencies."""
 import html
 import json
 import re
@@ -32,6 +32,27 @@ def validate(data):
             raise ValueError('Missing steps')
         if any(not isinstance(s, str) or not s.strip() for s in card['steps']):
             raise ValueError('Invalid step')
+        for field in ('explanation', 'pitfalls', 'keywords', 'sources'):
+            if not isinstance(card.get(field), list) or not card[field]:
+                raise ValueError('Missing guide body ' + field)
+        for field in ('explanation', 'pitfalls', 'keywords'):
+            if any(not isinstance(s, str) or not s.strip() for s in card[field]):
+                raise ValueError('Invalid guide body ' + field)
+        example = card.get('example')
+        if not isinstance(example, dict) or any(not isinstance(example.get(k), str) or not example[k].strip() for k in ('situation', 'action', 'signal')):
+            raise ValueError('Missing labelled example')
+        if '虚构演示' not in example['situation']:
+            raise ValueError('Example must be explicitly labelled')
+        for source in card['sources']:
+            if not isinstance(source, dict) or any(not isinstance(source.get(k), str) or not source[k].strip() for k in ('id', 'work', 'title', 'locator', 'note')):
+                raise ValueError('Incomplete source metadata')
+            if not re.fullmatch(r'SRC-\d{4}|ED-S[1-6]-[A-F0-9]{8}', source['id']):
+                raise ValueError('Invalid source identity')
+        if not isinstance(card.get('related'), list) or any(not isinstance(s, str) for s in card['related']):
+            raise ValueError('Invalid related links')
+    for card in data['cards']:
+        if any(target not in ids or target == card['id'] for target in card['related']):
+            raise ValueError('Unresolved related guide')
     return data
 
 
@@ -43,19 +64,37 @@ def build():
     data = validate(json.loads((PUBLIC / 'content/guides.json').read_text(encoding='utf-8')))
     (PUBLIC / 'content/guides.js').write_text('window.PUBLIC_GUIDES = ' + script_json(data) + ';\n', encoding='utf-8')
     lines = ['# 现代思维人生指南 · 免费公开指南', '', '版本：' + data['version'], '', data['notice'], '',
-             '以下为本项目原创通用建议。可以只阅读，也可以选择一条用于整理自己的问题。', '']
+             '以下为依据课程材料改写的原创应用指南。具体步骤与虚构演示为本项目推演，课程观点不等于外部验证。', '',
+             '来源列出作品、篇名和页码，不附课程原文。未重新读取原件的条目依据项目既有提取稿，并保留提取限制。', '']
+    lines += [f'- [{c["title"]}](#guide-{c["id"]})' for c in data['cards']] + ['']
+    by_id = {c['id']: c for c in data['cards']}
     for card in data['cards']:
-        lines += ['## ' + card['title'], '', card['summary'], '', '适用场景：' + card['when'], '']
+        lines += ['<a id="guide-' + card['id'] + '"></a>', '', '## ' + card['title'], '', card['summary'], '',
+                  '### 适用时机', '', card['when'], '', '### 为什么这样做', '']
+        for paragraph in card['explanation']:
+            lines += [paragraph, '']
+        lines += ['### 可以这样做', '']
         lines += [f'{i}. {step}' for i, step in enumerate(card['steps'], 1)]
-        lines += ['', '回看：' + card['watch'], '', '边界：' + card['limit'], '', '来源：' + card['origin'], '']
+        lines += ['', '### 虚构演示', '', card['example']['situation'], '', card['example']['action'], '', card['example']['signal'], '',
+                  '### 容易误用的地方', '']
+        lines += ['- ' + value for value in card['pitfalls']]
+        lines += ['', '### 何时回看', '', card['watch'], '', '### 不适用的情况', '', card['limit'], '', '### 依据与来源', '', card['origin'], '']
+        for source in card['sources']:
+            lines += ['- ' + ' · '.join(source[k] for k in ('work', 'title', 'id', 'locator')), '  ' + source['note'], '']
+        if card['related']:
+            lines += ['继续阅读 ' + ' · '.join(f'[{by_id[t]["title"]}](#guide-{t})' for t in card['related']), '']
     (PUBLIC / 'guide.md').write_text('\n'.join(lines), encoding='utf-8')
 
     page = (PUBLIC / 'index.html').read_text(encoding='utf-8')
+    # A newly opened edition must not reuse the old eight-guide scripts from cache.
+    page = re.sub(r'((?:src|href)="\./(?:style\.css|content/guides\.js|core\.js|app\.js))(?:\?[^\"]*)?"',
+                  lambda match: match.group(1) + '?v=' + data['version'] + '"', page)
+    (PUBLIC / 'index.html').write_text(page, encoding='utf-8')
     page = re.sub(r'\s*<meta[^>]*http-equiv="Content-Security-Policy"[^>]*>', '', page)
     css = (PUBLIC / 'style.css').read_text(encoding='utf-8')
-    page = page.replace('<link rel="stylesheet" href="./style.css">', '<style>\n' + css + '\n</style>')
+    page = re.sub(r'<link rel="stylesheet" href="\./style\.css(?:\?[^\"]*)?">', lambda _: '<style>\n' + css + '\n</style>', page)
     for source in ('content/guides.js', 'core.js', 'app.js'):
-        page = re.sub(r'<script\s+defer\s+src="\./' + re.escape(source) + r'"></script>', '', page)
+        page = re.sub(r'<script\s+defer\s+src="\./' + re.escape(source) + r'(?:\?[^\"]*)?"></script>', '', page)
     page = page.replace('<body>', '<body id="top">')
     links = {'./guide.md': '#guides', './offline.html': '#top',
              './PRIVACY.md': '#offline-privacy', './NOTICE.md': '#offline-notice',

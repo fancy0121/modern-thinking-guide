@@ -76,6 +76,14 @@
     if (guide) {
       lines.push('自愿附加的公开指南（原创项目材料，未验证，不是用户笔记）：');
       lines.push(`标题：${guide.title || ''}`, `版本：${guide.version || '未提供'}`, `摘要：${guide.summary || ''}`, `适用时机：${guide.when || ''}`, `步骤：${(guide.steps || []).join(' → ')}`, `留意：${guide.watch || ''}`, `边界：${guide.limit || ''}`);
+      lines.push(...(guide.explanation || []));
+      if (guide.example) lines.push('以下为虚构演示，不能当作用户经历或现实效果证据：', guide.example.situation, guide.example.action, guide.example.signal);
+      if (guide.pitfalls) lines.push('容易误用的地方：', ...guide.pitfalls);
+      if (guide.origin) lines.push('来源状态：' + guide.origin);
+      for (const source of guide.sources || []) {
+        lines.push([source.work, source.title, source.id, source.locator].join(' · '), source.note);
+      }
+      lines.push('请围绕我的实际问题提供帮助，检查适用条件；不必机械套用指南，也不要把虚构示例当成我的事实。');
     }
     return lines.join('\n');
   }

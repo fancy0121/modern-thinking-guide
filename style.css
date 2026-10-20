@@ -1,4 +1,4 @@
-:root { color-scheme: light; font-family: system-ui, -apple-system, "Segoe UI", sans-serif; color: #18212b; background: #f6f7f5; }
+:root { color-scheme: light; font-family: "Microsoft YaHei", "PingFang SC", system-ui, -apple-system, "Segoe UI", sans-serif; color: #18212b; background: #f6f7f5; }
 * { box-sizing: border-box; }
 body { margin: 0; line-height: 1.6; }
 a { color: #185c58; }
@@ -14,6 +14,21 @@ h1, h2, h3 { line-height: 1.2; }
 .card, aside, form, .export { background: #fff; border: 1px solid #d9e1dc; border-radius: 14px; padding: 1rem; margin-bottom: 1rem; }
 .card header { padding: 0; align-items: flex-start; }
 .tag { color: #53655e; font-size: .9rem; }
+.card { scroll-margin-top: 1rem; }
+.card h3 { font-size: 1.23rem; margin: .55rem 0; line-height: 1.5; }
+.card h3 a { color: #18212b; text-decoration: none; }
+.card h3 a:hover { text-decoration: underline; }
+.card h4 { font-size: 1rem; margin: 1.5rem 0 .5rem; }
+.card details { border-top: 1px solid #e3e9e5; margin-top: .8rem; padding-top: .8rem; }
+.card summary { cursor: pointer; color: #185c58; font-weight: 650; padding: .35rem 0; }
+.card li { margin: .7rem 0; padding-left: .2rem; }
+.card ol, .card ul { padding-left: 1.5rem; }
+.example { background: #f1f6f2; border-left: 3px solid #92b4a3; padding: .1rem 1rem .6rem; margin-top: 1.2rem; }
+.sources { border-top: 1px solid #e3e9e5; margin-top: 1.4rem; font-size: .9rem; color: #53615a; }
+.sources p { margin: .5rem 0; }
+.related-link { display: block; padding: .35rem 0; }
+.hero .hero-actions { display: flex; flex-wrap: wrap; gap: .7rem; margin-top: 1.2rem; }
+.hero-actions a { padding: .5rem .9rem; border: 1px solid #8aa89a; border-radius: 8px; text-decoration: none; background: #fff9; }
 label { display: block; font-weight: 650; margin: .7rem 0; }
 input, textarea, select, button { width: 100%; font: inherit; padding: .65rem; border: 1px solid #aebcb4; border-radius: 8px; }
 textarea { min-height: 6rem; resize: vertical; }
@@ -24,4 +39,4 @@ button.secondary { background: white; color: #185c58; }
 .notice { min-height: 1.5rem; color: #8b3b20; }
 footer { color: #53615a; font-size: .9rem; }
 body, p, h1, h2, h3, summary, button, label, a { overflow-wrap: anywhere; }
-@media (max-width: 760px) { header, .controls, .layout { display: block; } .controls > * { margin-bottom: .7rem; } }
+@media (max-width: 760px) { header, .controls, .layout { display: block; } .controls > * { margin-bottom: .7rem; } .hero { padding: 1.3rem; } }
