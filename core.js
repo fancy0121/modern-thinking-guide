@@ -67,11 +67,13 @@
   function context(state, selectedId, guide) {
     validate(state);
     const records = selectedId ? state.records.filter(item => item.id === selectedId) : state.records;
-    const lines = ['用户自己的笔记（以下判断均由用户填写，不是AI答案）：'];
-    for (const record of records) for (const version of record.versions) {
-      lines.push(`问题：${version.input}`, `我的判断：${version.answer || '（尚未形成判断）'}`);
-      if (version.choice) lines.push(`我的下一步：${version.choice}`);
-      if (version.review) lines.push(`我计划回看：${version.review}`);
+    const lines = ['用户自己的笔记（以下判断均由用户填写，不是AI答案）：', '“当前”仅表示该记录最后保存的版本，不表示内容已验证；历史版本全部保留。'];
+    for (const record of records) {
+      lines.push(`记录：${record.id}（${record.versions.length}个版本）`);
+      record.versions.forEach((version, index) => {
+        const status = index === record.versions.length - 1 ? '当前' : '历史';
+        lines.push(`版本 ${index + 1}（${status}）`, `保存时间：${version.at || '（未记录）'}`, `问题：${version.input}`, `我的判断：${version.answer || '（尚未形成判断）'}`, `我的下一步：${version.choice || '（未填写）'}`, `我计划回看：${version.review || '（未填写）'}`);
+      });
     }
     if (guide) {
       lines.push('自愿附加的公开指南（原创项目材料，未验证，不是用户笔记）：');

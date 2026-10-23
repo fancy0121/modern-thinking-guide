@@ -42,6 +42,13 @@
     const box = $('guides'); box.replaceChildren(); const query = $('search').value.trim().toLowerCase(); const category = $('category').value;
     const filtered = guides.filter(g => (!category || g.category === category) && (!query || JSON.stringify(g).toLowerCase().includes(query)));
     $('guide-count').textContent = filtered.length ? `显示 ${filtered.length} / ${guides.length} 篇` : `没有找到匹配指南（共 ${guides.length} 篇）`;
+    if (!filtered.length) {
+      paragraph(box, '这里按关键词匹配。可以换一个短词，或清空搜索和类别，浏览全部指南。');
+      box.append(button('清空筛选，查看全部指南', () => {
+        $('search').value = ''; $('category').value = ''; renderGuides(); $('search').focus();
+      }, true));
+      return;
+    }
     filtered.forEach(g => {
       const card = document.createElement('article'); card.className = 'card'; card.id = 'guide-' + g.id;
       const tag = paragraph(card, `${g.category || ''} · 约${Math.max(2, Math.ceil(JSON.stringify(g).length / 500))}分钟`); tag.className = 'tag';
