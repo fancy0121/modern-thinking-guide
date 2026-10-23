@@ -9,7 +9,7 @@ PUBLIC = Path(__file__).resolve().parents[1]
 EXPORT_FILES = (
     '.nojekyll', 'index.html', 'style.css', 'app.js', 'core.js',
     'content/guides.json', 'content/guides.js', 'guide.md', 'offline.html',
-    'README.md', 'PRIVACY.md', 'NOTICE.md',
+    'README.md', 'PRIVACY.md', 'NOTICE.md', 'COURSE_COVERAGE.md', 'COURSE_COVERAGE.html',
     'skills/modern-thinking-public/SKILL.md', 'tools/build.py',
 )
 
@@ -86,7 +86,7 @@ def build():
     (PUBLIC / 'guide.md').write_text('\n'.join(lines), encoding='utf-8')
 
     page = (PUBLIC / 'index.html').read_text(encoding='utf-8')
-    # A newly opened edition must not reuse the old eight-guide scripts from cache.
+    # A newly opened edition must not reuse a previous edition's scripts from cache.
     page = re.sub(r'((?:src|href)="\./(?:style\.css|content/guides\.js|core\.js|app\.js))(?:\?[^\"]*)?"',
                   lambda match: match.group(1) + '?v=' + data['version'] + '"', page)
     (PUBLIC / 'index.html').write_text(page, encoding='utf-8')
@@ -98,9 +98,11 @@ def build():
     page = page.replace('<body>', '<body id="top">')
     links = {'./guide.md': '#guides', './offline.html': '#top',
              './PRIVACY.md': '#offline-privacy', './NOTICE.md': '#offline-notice',
+             './COURSE_COVERAGE.html': 'https://fancy0121.github.io/modern-thinking-guide/COURSE_COVERAGE.html',
              './download/modern-thinking-guide.zip': 'https://fancy0121.github.io/modern-thinking-guide/download/modern-thinking-guide.zip'}
     for old, new in links.items():
         page = page.replace('href="' + old + '"', 'href="' + new + '"')
+    page = page.replace('查看100讲对应指南</a>', '查看100讲对应指南（在线）</a>')
     legal = '\n<section class="offline-legal"><h2 id="offline-privacy">隐私说明</h2><pre>' + html.escape((PUBLIC / 'PRIVACY.md').read_text(encoding='utf-8')) + '</pre>'
     legal += '<h2 id="offline-notice">免费使用与权利说明</h2><pre>' + html.escape((PUBLIC / 'NOTICE.md').read_text(encoding='utf-8')) + '</pre></section>\n'
     scripts = '\n'.join((PUBLIC / source).read_text(encoding='utf-8').replace('</script', '<\\/script') for source in ('content/guides.js', 'core.js', 'app.js'))
