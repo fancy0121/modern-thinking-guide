@@ -55,9 +55,9 @@ body, p, h1, h2, h3, summary, button, label, a { overflow-wrap: anywhere; }
   <header><strong>这件事，下一步</strong><nav><a href="#library">找一篇指南</a><a href="#guides">阅读全文</a><a href="#top">离线版</a></nav></header>
   <main>
     <section class="hero"><h1>现代思维人生指南</h1><p>努力没被认可、资料越查越乱、想做却迟迟没开始。先找与你眼前处境有关的一篇，读清做法和边界，再决定自己的下一步。</p><p>115篇场景指南，包含思考依据、具体步骤、演示和回看条件。免费阅读，无需注册。愿意时，可以把自己的判断留在这台设备上。</p><div class="hero-actions"><a href="#library">按问题找指南</a><a href="#record">记下我的下一步</a><a href="https://fancy0121.github.io/modern-thinking-guide/COURSE_COVERAGE.html">查看100讲对应指南（在线）</a></div></section>
-    <section class="controls" id="library" aria-label="指南筛选"><input id="search" type="search" placeholder="试试“报课”“不被认可”“沟通”" aria-label="搜索指南"><select id="category" aria-label="选择类别"><option value="">全部类别</option></select></section>
-    <p class="tag">指南依据《现代思维工具100讲》《精英日课》的已核对材料改写。具体做法与虚构演示为本项目推演，尚待真实使用反馈；本站不代表课程作者。</p>
-    <div class="layout"><section><h2>从眼前的问题开始</h2><p id="guide-count" class="tag" role="status" aria-live="polite"></p><div id="guides"></div></section><aside id="record"><h2>整理一件事</h2><p class="tag">愿意时再写，判断可以留空。有新事实时追加一个版本，旧版会保留。记录只在当前浏览器保存，请导出备份。</p><p class="tag">需要AI时，可把整篇指南或自己选定的记录复制到已有AI。本站不提供自动AI聊天。</p><button id="new-record" class="secondary" type="button">开始新记录</button><form id="record-form"><label>我遇到的问题<input id="input" required></label><label>我现在的判断（可留空）<textarea id="answer"></textarea></label><label>下一步（可留空）<input id="choice"></label><label>什么变化时回看（可留空）<input id="review"></label><button type="submit">保存我的记录</button><p id="notice" class="notice" role="status"></p></form><div id="records"></div><div class="export"><h3>备份与恢复</h3><textarea id="backup" aria-label="JSON备份内容" placeholder="导出后可复制保存"></textarea><button id="export-copy" class="secondary" type="button">导出并复制</button><button id="export-download" class="secondary" type="button">下载JSON备份</button><label>导入JSON<input id="import-file" type="file" accept="application/json,.json"></label><button id="clear" class="secondary" type="button">清除此设备上的记录</button></div></aside></div>
+    <section class="controls" id="library" aria-label="指南筛选"><input id="search" type="search" placeholder="试试“临时加活”“做笔记”“选工作”" aria-label="搜索指南"><select id="category" aria-label="选择类别"><option value="">全部类别</option></select></section>
+    <p class="tag">可以输入短词或多个关键词，先看标题和适用时机。改写一句话、简单计算或写提醒，直接处理就好；这里帮助整理需要判断的事情。</p><p class="tag">指南依据《现代思维工具100讲》《精英日课》的已核对材料改写。具体做法与虚构演示为本项目推演，尚待真实使用反馈；本站不代表课程作者。</p>
+    <div class="layout"><section><h2>从眼前的问题开始</h2><p id="guide-count" class="tag" role="status" aria-live="polite"></p><div id="guides"></div></section><aside id="record"><h2>整理一件事</h2><p class="tag">愿意时再写，判断可以留空。有新事实时追加一个版本，旧版会保留。记录只在当前浏览器保存，请导出备份。需要时手动回看，不会按时间自动提醒。</p><p class="tag">需要AI时，可把整篇指南或自己选定的记录复制到已有AI。本站不提供自动AI聊天。</p><button id="new-record" class="secondary" type="button">开始新记录</button><form id="record-form"><label>我遇到的问题<input id="input" required></label><label>我现在的判断（可留空）<textarea id="answer"></textarea></label><label>下一步（可留空）<input id="choice"></label><label>什么变化时回看（可留空）<input id="review"></label><button type="submit">保存我的记录</button><p id="notice" class="notice" role="status"></p></form><div id="records"></div><div class="export"><h3>备份与恢复</h3><textarea id="backup" aria-label="JSON备份内容" placeholder="导出后可复制保存"></textarea><button id="export-copy" class="secondary" type="button">导出并复制</button><button id="export-download" class="secondary" type="button">下载JSON备份</button><label>导入JSON<input id="import-file" type="file" accept="application/json,.json"></label><button id="clear" class="secondary" type="button">清除此设备上的记录</button></div></aside></div>
   </main>
   <footer><p><a href="https://fancy0121.github.io/modern-thinking-guide/download/modern-thinking-guide.zip">下载公开包</a> · <a href="#offline-privacy">隐私说明</a> · <a href="https://github.com/fancy0121/modern-thinking-guide">GitHub</a> · <a href="https://github.com/fancy0121/modern-thinking-guide/issues">反馈（请不要公开私人故事）</a></p></footer>
 
@@ -88,7 +88,7 @@ body, p, h1, h2, h3, summary, button, label, a { overflow-wrap: anywhere; }
 </pre></section>
 <script>
 window.PUBLIC_GUIDES = {
-  "version": "2026-10-23-course.1",
+  "version": "2026-10-25-search.1",
   "notice": "依据课程材料改写的免费应用指南。具体步骤与虚构演示为本项目推演，尚未验证现实效果，也不代表课程作者的官方服务。",
   "cards": [
     {
@@ -2142,7 +2142,7 @@ window.PUBLIC_GUIDES = {
       "id": "course-src-0029",
       "title": "别人建议都很有道理，我该按什么选",
       "category": "选择",
-      "summary": "先说明自己追求什么，再让事实帮助比较可行办法。",
+      "summary": "先核对每条建议默认的目标和条件，判断它适不适合自己。",
       "when": "同一件事有人劝稳，有人劝拼，你希望找到对所有人都正确的答案。",
       "steps": [
         "用自己的话写下这次最想得到的变化，并列出一项不愿付出的代价。",
@@ -5181,7 +5181,7 @@ window.PUBLIC_GUIDES = {
       "id": "course-src-0111",
       "title": "每条建议都有道理，究竟哪条该占更大分量",
       "category": "选择",
-      "summary": "围绕这次目标比较各项因素的影响，别让容易说清的小事占满判断。",
+      "summary": "目标明确后，给影响结果的因素排轻重，优先核实能让结论改变的条件。",
       "when": "你越听建议越纠结，每个人都能举出反例，最后只能挑一个最显眼的细节决定。",
       "steps": [
         "说明这次比较的两个选项、主要目标与时间范围，先排除违背安全等硬约束的选项。",
@@ -5838,6 +5838,74 @@ window.PUBLIC_GUIDES = {
   function heading(parent, text) { const h = document.createElement('h4'); h.textContent = text; parent.append(h); }
   function list(parent, items, ordered) { const ul = document.createElement(ordered ? 'ol' : 'ul'); (items || []).forEach(text => { const li = document.createElement('li'); li.textContent = text; ul.append(li); }); parent.append(ul); }
   function selectedHash() { return window.location ? window.location.hash : ''; }
+  const SEARCH_CONCEPTS = [
+    { phrases: ['加活', '临时加任务', '交不完', '交不出来'], terms: ['任务不断增加', '交付'] },
+    { phrases: ['提前', '推迟', '改期', '重排'], terms: ['期限变化', '计划修订'] },
+    { phrases: ['不回', '晾着'], terms: ['不回复'] },
+    { phrases: ['甩锅', '背锅'], terms: ['替罪羊', '担责'] },
+    { phrases: ['没人落实'], terms: ['可执行结果', '负责人'] },
+    { phrases: ['选工作', '两个工作', '两份工作'], terms: ['工作机会', '比较'] },
+    { phrases: ['做笔记'], terms: ['笔记'] },
+    { phrases: ['收藏课程', '囤课', '课程视频', '看教程'], terms: ['教程', '练习'] },
+    { phrases: ['诉苦'], terms: ['倾诉'] },
+    { phrases: ['报名'], terms: ['报课'] },
+    { phrases: ['器材', '闲置'], terms: ['购买'] }
+  ];
+  const FUNCTION_TOKENS = new Set(['这个', '那个', '怎么', '什么', '一个', '一下', '我们', '你们', '他们', '自己', '事情', '问题', '现在', '还是', '就是', '可以', '需要', '已经', '没有', '因为', '所以', '然后', '如果', '是否', '多少', '是多', '等于', '我想', '想了', '了解', '知道', '一点', '改得', '客气']);
+  const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('zh-CN', { granularity: 'word' }) : null;
+  function normalized(value) { return String(value || '').normalize('NFKC').toLocaleLowerCase('zh-CN'); }
+  function tokensFor(value) {
+    const text = normalized(value); const tokens = new Set();
+    if (segmenter) {
+      for (const part of segmenter.segment(text)) if (part.isWordLike && part.segment.length >= 2) tokens.add(part.segment);
+    } else {
+      for (const run of text.match(/[\u3400-\u9fff]+/g) || []) for (const size of [2, 3]) for (let index = 0; index <= run.length - size; index++) tokens.add(run.slice(index, index + size));
+    }
+    for (const word of text.match(/[a-z0-9][a-z0-9_-]{1,}/g) || []) if (!/^\d+$/.test(word)) tokens.add(word);
+    return tokens;
+  }
+  function addFieldTokens(target, value, weight) { for (const token of tokensFor(value)) target.set(token, Math.max(target.get(token) || 0, weight)); }
+  function indexGuide(guide, index) {
+    const weights = new Map();
+    addFieldTokens(weights, guide.title, 6); addFieldTokens(weights, guide.when, 4); addFieldTokens(weights, (guide.keywords || []).join(' '), 4); addFieldTokens(weights, guide.summary, 3);
+    addFieldTokens(weights, (guide.explanation || []).join(' '), 1); addFieldTokens(weights, (guide.steps || []).join(' '), 1); addFieldTokens(weights, guide.example ? Object.values(guide.example).join(' ') : '', 1);
+    return { guide, index, weights, sourceIds: new Set((guide.sources || []).map(source => normalized(source.id))), exact: normalized(JSON.stringify(guide)), fields: { title: normalized(guide.title), when: normalized(guide.when), keywords: normalized((guide.keywords || []).join(' ')), summary: normalized(guide.summary) } };
+  }
+  const SEARCH_INDEX = guides.map(indexGuide);
+  const TOKEN_DF = new Map();
+  SEARCH_INDEX.forEach(entry => entry.weights.forEach((_, token) => TOKEN_DF.set(token, (TOKEN_DF.get(token) || 0) + 1)));
+  function queryTokens(query) {
+    const concepts = [...new Set(SEARCH_CONCEPTS.filter(concept => concept.phrases.some(phrase => query.includes(phrase))).flatMap(concept => concept.terms))];
+    // Without a word segmenter, retain explicit words/phrases instead of guessing
+    // meaning from arbitrary overlapping characters in a whole situation.
+    const candidates = segmenter ? tokensFor([query, ...concepts].join(' ')) : new Set([...query.split(/\s+/), ...concepts].filter(term => term.length >= 2));
+    return { concepts, tokens: new Set([...candidates].filter(token => !FUNCTION_TOKENS.has(token) && (TOKEN_DF.get(token) || 0) <= guides.length * 0.45)) };
+  }
+  function searchScore(entry, query, info) {
+    if (normalized(entry.guide.title).includes(query)) return 100000;
+    if (entry.sourceIds.has(query)) return 90000;
+    if (entry.exact.includes(query)) return 80000;
+    let score = 0; let matches = 0; let highWeight = false;
+    info.tokens.forEach(token => {
+      const weight = entry.weights.get(token); if (!weight) return;
+      const idf = Math.log((guides.length + 1) / ((TOKEN_DF.get(token) || 0) + 1)) + 1;
+      score += weight * idf; matches++; if (weight >= 4) highWeight = true;
+    });
+    info.concepts.forEach(term => {
+      const fieldWeight = entry.fields.title.includes(term) ? 6 : (entry.fields.when.includes(term) || entry.fields.keywords.includes(term)) ? 4 : entry.fields.summary.includes(term) ? 3 : 0;
+      if (!fieldWeight) return;
+      score += fieldWeight * 2; matches++; highWeight = true;
+    });
+    const shortQuery = query.replace(/[^\u3400-\u9fff\w]/g, '').length <= 4;
+    if (!highWeight || (shortQuery ? matches < 1 : matches < 2)) return 0;
+    return score;
+  }
+  function searchGuides(query, category) {
+    const eligible = SEARCH_INDEX.filter(entry => !category || entry.guide.category === category);
+    if (!query) return eligible.map(entry => entry.guide);
+    const info = queryTokens(query); if (!info.tokens.size && !info.concepts.length) return [];
+    return eligible.map(entry => ({ entry, score: searchScore(entry, query, info) })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.entry.index - b.entry.index).slice(0, 5).map(item => item.entry.guide);
+  }
   function guideBody(parent, g) {
     heading(parent, '适用时机'); paragraph(parent, g.when);
     heading(parent, '为什么这样做'); (g.explanation || []).forEach(text => paragraph(parent, text));
@@ -5858,7 +5926,7 @@ window.PUBLIC_GUIDES = {
   }
   function renderGuides() {
     const box = $('guides'); box.replaceChildren(); const query = $('search').value.trim().toLowerCase(); const category = $('category').value;
-    const filtered = guides.filter(g => (!category || g.category === category) && (!query || JSON.stringify(g).toLowerCase().includes(query)));
+    const filtered = searchGuides(query, category);
     $('guide-count').textContent = filtered.length ? `显示 ${filtered.length} / ${guides.length} 篇` : `没有找到匹配指南（共 ${guides.length} 篇）`;
     if (!filtered.length) {
       paragraph(box, '这里按关键词匹配。可以换一个短词，或清空搜索和类别，浏览全部指南。');

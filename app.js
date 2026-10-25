@@ -20,6 +20,74 @@
   function heading(parent, text) { const h = document.createElement('h4'); h.textContent = text; parent.append(h); }
   function list(parent, items, ordered) { const ul = document.createElement(ordered ? 'ol' : 'ul'); (items || []).forEach(text => { const li = document.createElement('li'); li.textContent = text; ul.append(li); }); parent.append(ul); }
   function selectedHash() { return window.location ? window.location.hash : ''; }
+  const SEARCH_CONCEPTS = [
+    { phrases: ['加活', '临时加任务', '交不完', '交不出来'], terms: ['任务不断增加', '交付'] },
+    { phrases: ['提前', '推迟', '改期', '重排'], terms: ['期限变化', '计划修订'] },
+    { phrases: ['不回', '晾着'], terms: ['不回复'] },
+    { phrases: ['甩锅', '背锅'], terms: ['替罪羊', '担责'] },
+    { phrases: ['没人落实'], terms: ['可执行结果', '负责人'] },
+    { phrases: ['选工作', '两个工作', '两份工作'], terms: ['工作机会', '比较'] },
+    { phrases: ['做笔记'], terms: ['笔记'] },
+    { phrases: ['收藏课程', '囤课', '课程视频', '看教程'], terms: ['教程', '练习'] },
+    { phrases: ['诉苦'], terms: ['倾诉'] },
+    { phrases: ['报名'], terms: ['报课'] },
+    { phrases: ['器材', '闲置'], terms: ['购买'] }
+  ];
+  const FUNCTION_TOKENS = new Set(['这个', '那个', '怎么', '什么', '一个', '一下', '我们', '你们', '他们', '自己', '事情', '问题', '现在', '还是', '就是', '可以', '需要', '已经', '没有', '因为', '所以', '然后', '如果', '是否', '多少', '是多', '等于', '我想', '想了', '了解', '知道', '一点', '改得', '客气']);
+  const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('zh-CN', { granularity: 'word' }) : null;
+  function normalized(value) { return String(value || '').normalize('NFKC').toLocaleLowerCase('zh-CN'); }
+  function tokensFor(value) {
+    const text = normalized(value); const tokens = new Set();
+    if (segmenter) {
+      for (const part of segmenter.segment(text)) if (part.isWordLike && part.segment.length >= 2) tokens.add(part.segment);
+    } else {
+      for (const run of text.match(/[\u3400-\u9fff]+/g) || []) for (const size of [2, 3]) for (let index = 0; index <= run.length - size; index++) tokens.add(run.slice(index, index + size));
+    }
+    for (const word of text.match(/[a-z0-9][a-z0-9_-]{1,}/g) || []) if (!/^\d+$/.test(word)) tokens.add(word);
+    return tokens;
+  }
+  function addFieldTokens(target, value, weight) { for (const token of tokensFor(value)) target.set(token, Math.max(target.get(token) || 0, weight)); }
+  function indexGuide(guide, index) {
+    const weights = new Map();
+    addFieldTokens(weights, guide.title, 6); addFieldTokens(weights, guide.when, 4); addFieldTokens(weights, (guide.keywords || []).join(' '), 4); addFieldTokens(weights, guide.summary, 3);
+    addFieldTokens(weights, (guide.explanation || []).join(' '), 1); addFieldTokens(weights, (guide.steps || []).join(' '), 1); addFieldTokens(weights, guide.example ? Object.values(guide.example).join(' ') : '', 1);
+    return { guide, index, weights, sourceIds: new Set((guide.sources || []).map(source => normalized(source.id))), exact: normalized(JSON.stringify(guide)), fields: { title: normalized(guide.title), when: normalized(guide.when), keywords: normalized((guide.keywords || []).join(' ')), summary: normalized(guide.summary) } };
+  }
+  const SEARCH_INDEX = guides.map(indexGuide);
+  const TOKEN_DF = new Map();
+  SEARCH_INDEX.forEach(entry => entry.weights.forEach((_, token) => TOKEN_DF.set(token, (TOKEN_DF.get(token) || 0) + 1)));
+  function queryTokens(query) {
+    const concepts = [...new Set(SEARCH_CONCEPTS.filter(concept => concept.phrases.some(phrase => query.includes(phrase))).flatMap(concept => concept.terms))];
+    // Without a word segmenter, retain explicit words/phrases instead of guessing
+    // meaning from arbitrary overlapping characters in a whole situation.
+    const candidates = segmenter ? tokensFor([query, ...concepts].join(' ')) : new Set([...query.split(/\s+/), ...concepts].filter(term => term.length >= 2));
+    return { concepts, tokens: new Set([...candidates].filter(token => !FUNCTION_TOKENS.has(token) && (TOKEN_DF.get(token) || 0) <= guides.length * 0.45)) };
+  }
+  function searchScore(entry, query, info) {
+    if (normalized(entry.guide.title).includes(query)) return 100000;
+    if (entry.sourceIds.has(query)) return 90000;
+    if (entry.exact.includes(query)) return 80000;
+    let score = 0; let matches = 0; let highWeight = false;
+    info.tokens.forEach(token => {
+      const weight = entry.weights.get(token); if (!weight) return;
+      const idf = Math.log((guides.length + 1) / ((TOKEN_DF.get(token) || 0) + 1)) + 1;
+      score += weight * idf; matches++; if (weight >= 4) highWeight = true;
+    });
+    info.concepts.forEach(term => {
+      const fieldWeight = entry.fields.title.includes(term) ? 6 : (entry.fields.when.includes(term) || entry.fields.keywords.includes(term)) ? 4 : entry.fields.summary.includes(term) ? 3 : 0;
+      if (!fieldWeight) return;
+      score += fieldWeight * 2; matches++; highWeight = true;
+    });
+    const shortQuery = query.replace(/[^\u3400-\u9fff\w]/g, '').length <= 4;
+    if (!highWeight || (shortQuery ? matches < 1 : matches < 2)) return 0;
+    return score;
+  }
+  function searchGuides(query, category) {
+    const eligible = SEARCH_INDEX.filter(entry => !category || entry.guide.category === category);
+    if (!query) return eligible.map(entry => entry.guide);
+    const info = queryTokens(query); if (!info.tokens.size && !info.concepts.length) return [];
+    return eligible.map(entry => ({ entry, score: searchScore(entry, query, info) })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.entry.index - b.entry.index).slice(0, 5).map(item => item.entry.guide);
+  }
   function guideBody(parent, g) {
     heading(parent, '适用时机'); paragraph(parent, g.when);
     heading(parent, '为什么这样做'); (g.explanation || []).forEach(text => paragraph(parent, text));
@@ -40,7 +108,7 @@
   }
   function renderGuides() {
     const box = $('guides'); box.replaceChildren(); const query = $('search').value.trim().toLowerCase(); const category = $('category').value;
-    const filtered = guides.filter(g => (!category || g.category === category) && (!query || JSON.stringify(g).toLowerCase().includes(query)));
+    const filtered = searchGuides(query, category);
     $('guide-count').textContent = filtered.length ? `显示 ${filtered.length} / ${guides.length} 篇` : `没有找到匹配指南（共 ${guides.length} 篇）`;
     if (!filtered.length) {
       paragraph(box, '这里按关键词匹配。可以换一个短词，或清空搜索和类别，浏览全部指南。');
