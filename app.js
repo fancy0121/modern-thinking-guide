@@ -33,7 +33,7 @@
     { phrases: ['报名'], terms: ['报课'] },
     { phrases: ['器材', '闲置'], terms: ['购买'] }
   ];
-  const FUNCTION_TOKENS = new Set(['这个', '那个', '怎么', '什么', '一个', '一下', '我们', '你们', '他们', '自己', '事情', '问题', '现在', '还是', '就是', '可以', '需要', '已经', '没有', '因为', '所以', '然后', '如果', '是否', '多少', '是多', '等于', '我想', '想了', '了解', '知道', '一点', '改得', '客气']);
+  const FUNCTION_TOKENS = new Set(['这个', '那个', '怎么', '什么', '一个', '一下', '我们', '你们', '他们', '自己', '事情', '问题', '现在', '还是', '就是', '可以', '需要', '已经', '没有', '因为', '所以', '然后', '如果', '是否', '多少', '是多', '等于', '我想', '想了', '了解', '知道', '一点', '改得', '客气', '每次', '最后', '都会', '变成', '反而', '才能']);
   const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('zh-CN', { granularity: 'word' }) : null;
   function normalized(value) { return String(value || '').normalize('NFKC').toLocaleLowerCase('zh-CN'); }
   function tokensFor(value) {
