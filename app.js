@@ -22,8 +22,8 @@
   function selectedHash() { return window.location ? window.location.hash : ''; }
   const SEARCH_CONCEPTS = [
     { phrases: ['加活', '临时加任务', '交不完', '交不出来'], terms: ['任务不断增加', '交付'] },
-    { phrases: ['提前', '推迟', '改期', '重排'], terms: ['期限变化', '计划修订'] },
-    { phrases: ['不回', '晾着'], terms: ['不回复'] },
+    { phrases: ['截止提前', '截止日期提前', '期限提前', '时间提前', '日期提前', '交期提前', '交付日期提前', '推迟', '改期', '重排'], terms: ['期限变化', '计划修订'] },
+    { phrases: ['不回', '没回', '晾着'], terms: ['不回复'] },
     { phrases: ['甩锅', '背锅'], terms: ['替罪羊', '担责'] },
     { phrases: ['没人落实'], terms: ['可执行结果', '负责人'] },
     { phrases: ['选工作', '两个工作', '两份工作'], terms: ['工作机会', '比较'] },
@@ -31,10 +31,13 @@
     { phrases: ['收藏课程', '囤课', '课程视频', '看教程'], terms: ['教程', '练习'] },
     { phrases: ['诉苦'], terms: ['倾诉'] },
     { phrases: ['报名'], terms: ['报课'] },
-    { phrases: ['器材', '闲置'], terms: ['购买'] }
+    { phrases: ['器材', '闲置'], terms: ['购买'] },
+    { phrases: ['找外包', '请外包', '外包设计', '外包开发'], terms: ['委托', '验收'] }
   ];
-  const FUNCTION_TOKENS = new Set(['这个', '那个', '怎么', '什么', '一个', '一下', '我们', '你们', '他们', '自己', '事情', '问题', '现在', '还是', '就是', '可以', '需要', '已经', '没有', '因为', '所以', '然后', '如果', '是否', '多少', '是多', '等于', '我想', '想了', '了解', '知道', '一点', '改得', '客气', '每次', '最后', '都会', '变成', '反而', '才能']);
+  const FUNCTION_TOKENS = new Set(['这个', '那个', '怎么', '什么', '一个', '一下', '我们', '你们', '他们', '自己', '事情', '问题', '现在', '还是', '就是', '可以', '需要', '已经', '没有', '因为', '所以', '然后', '如果', '是否', '多少', '是多', '等于', '我想', '想了', '了解', '知道', '一点', '改得', '客气', '每次', '最后', '都会', '变成', '反而', '才能', '大家', '别人', '今天', '昨天', '最近', '结果', '其实', '总是', '一直', '根本', '严重', '这种', '那种', '只是', '为了', '但是', '不过', '不能', '不够', '明明', '觉得', '认为']);
   const segmenter = typeof Intl !== 'undefined' && Intl.Segmenter ? new Intl.Segmenter('zh-CN', { granularity: 'word' }) : null;
+  // These process words can help ranking, but do not establish topic fit alone.
+  const GENERIC_CONTEXT_TOKENS = new Set(['方法', '测试']);
   function normalized(value) { return String(value || '').normalize('NFKC').toLocaleLowerCase('zh-CN'); }
   function tokensFor(value) {
     const text = normalized(value); const tokens = new Set();
@@ -49,7 +52,7 @@
   function addFieldTokens(target, value, weight) { for (const token of tokensFor(value)) target.set(token, Math.max(target.get(token) || 0, weight)); }
   function indexGuide(guide, index) {
     const weights = new Map();
-    addFieldTokens(weights, guide.title, 6); addFieldTokens(weights, guide.when, 4); addFieldTokens(weights, (guide.keywords || []).join(' '), 4); addFieldTokens(weights, guide.summary, 3);
+    addFieldTokens(weights, guide.title, 4); addFieldTokens(weights, guide.when, 4); addFieldTokens(weights, (guide.keywords || []).join(' '), 4); addFieldTokens(weights, guide.summary, 1);
     addFieldTokens(weights, (guide.explanation || []).join(' '), 1); addFieldTokens(weights, (guide.steps || []).join(' '), 1); addFieldTokens(weights, guide.example ? Object.values(guide.example).join(' ') : '', 1);
     return { guide, index, weights, sourceIds: new Set((guide.sources || []).map(source => normalized(source.id))), exact: normalized(JSON.stringify(guide)), fields: { title: normalized(guide.title), when: normalized(guide.when), keywords: normalized((guide.keywords || []).join(' ')), summary: normalized(guide.summary) } };
   }
@@ -67,26 +70,40 @@
     if (normalized(entry.guide.title).includes(query)) return 100000;
     if (entry.sourceIds.has(query)) return 90000;
     if (entry.exact.includes(query)) return 80000;
-    let score = 0; let matches = 0; let highWeight = false;
+    let score = 0; let matches = 0; let highWeight = false; let contextMatch = false;
     info.tokens.forEach(token => {
       const weight = entry.weights.get(token); if (!weight) return;
       const idf = Math.log((guides.length + 1) / ((TOKEN_DF.get(token) || 0) + 1)) + 1;
       score += weight * idf; matches++; if (weight >= 4) highWeight = true;
+      if (!GENERIC_CONTEXT_TOKENS.has(token) && (entry.fields.when.includes(token) || entry.fields.keywords.includes(token))) contextMatch = true;
     });
     info.concepts.forEach(term => {
       const fieldWeight = entry.fields.title.includes(term) ? 6 : (entry.fields.when.includes(term) || entry.fields.keywords.includes(term)) ? 4 : entry.fields.summary.includes(term) ? 3 : 0;
       if (!fieldWeight) return;
       score += fieldWeight * 2; matches++; highWeight = true;
+      if (!GENERIC_CONTEXT_TOKENS.has(term) && (entry.fields.when.includes(term) || entry.fields.keywords.includes(term))) contextMatch = true;
     });
     const shortQuery = query.replace(/[^\u3400-\u9fff\w]/g, '').length <= 4;
     if (!highWeight || (shortQuery ? matches < 1 : matches < 2)) return 0;
-    return score;
+    return !shortQuery && !contextMatch ? score * 0.6 : score;
+  }
+  function capabilityBoundary(query) {
+    const treatmentQuery = query.replace(/(?:停掉|停用|关闭|取消)[^，,。!?]{0,8}(?:提醒|闹钟)/g, '');
+    const medicineContext = /医生开药|处方|服药|吃药|药量|剂量|降压药|血压药|降糖药|抗生素|这种药|这药/.test(treatmentQuery);
+    const medicineChange = /停药|停掉|停用|换药|加药|减药|增加.*剂量|减少.*剂量|调整.*剂量|(?:可以|能否|可不可以)(?:直接|自行)?停/.test(treatmentQuery);
+    const medicineQuestion = /能不能|能否|可不可以|要不要|该不该|是否应该|是否可以|可以(?:把|将|停|换|减|加)|怎么停药|如何(?:停药|换药|调整剂量)/.test(treatmentQuery);
+    if (medicineContext && medicineChange && medicineQuestion) return '本站不提供具体用药调整的判断，不能用一般认知指南回答停药、换药或剂量决定。';
+    const transactionContext = /平台|卖家|商家|订单|交易平台/.test(query);
+    const refundQuestion = /(?:能(?:不能)?|能否|可不可以|是否可以)[^。!?]{0,16}(?:退款|退货|赔偿)(?:吗|呢)?[!?]?$|(?:怎么|如何)(?:申请|办理)?(?:退款|退货)|(?:退款|退货)(?:规则|流程|政策)(?:是什么|怎么规定|如何规定|是怎样|有哪些)|(?:查询|查一下|查查|解释|说明)[^。!?]{0,10}(?:退款|退货)(?:规则|流程|政策)/.test(query);
+    if (transactionContext && refundQuestion) return '本站不提供特定平台退款规则、强制退款或申请流程的答案，不能用一般认知指南替代。';
+    return '';
   }
   function searchGuides(query, category) {
     const eligible = SEARCH_INDEX.filter(entry => !category || entry.guide.category === category);
     if (!query) return eligible.map(entry => entry.guide);
+    if (capabilityBoundary(query)) return [];
     const info = queryTokens(query); if (!info.tokens.size && !info.concepts.length) return [];
-    return eligible.map(entry => ({ entry, score: searchScore(entry, query, info) })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.entry.index - b.entry.index).slice(0, 5).map(item => item.entry.guide);
+    return eligible.map(entry => ({ entry, score: searchScore(entry, query, info) })).filter(item => item.score > 0).sort((a, b) => b.score - a.score || a.entry.index - b.entry.index).filter((item, _, ranked) => item.score >= ranked[0].score * 0.75).slice(0, 5).map(item => item.entry.guide);
   }
   function guideBody(parent, g) {
     heading(parent, '适用时机'); paragraph(parent, g.when);
@@ -107,11 +124,11 @@
     }
   }
   function renderGuides() {
-    const box = $('guides'); box.replaceChildren(); const query = $('search').value.trim().toLowerCase(); const category = $('category').value;
+    const box = $('guides'); box.replaceChildren(); const query = normalized($('search').value.trim()); const category = $('category').value;
     const filtered = searchGuides(query, category);
     $('guide-count').textContent = filtered.length ? `显示 ${filtered.length} / ${guides.length} 篇` : `没有找到匹配指南（共 ${guides.length} 篇）`;
     if (!filtered.length) {
-      paragraph(box, '这里按关键词匹配。可以换一个短词，或清空搜索和类别，浏览全部指南。');
+      paragraph(box, capabilityBoundary(query) || '这里按关键词匹配。可以换一个短词，或清空搜索和类别，浏览全部指南。');
       box.append(button('清空筛选，查看全部指南', () => {
         $('search').value = ''; $('category').value = ''; renderGuides(); $('search').focus();
       }, true));
